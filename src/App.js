@@ -8,6 +8,7 @@ import Shimmer from "./components/Shimmer";
 function App() {
   const [productsData, setProductsData] = useState(null);
   const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(10);
 
   const selectPageHadler = (pageNo) => {
     setPage(pageNo);
@@ -17,7 +18,7 @@ function App() {
     data: productsApiData,
     isLoading,
     error,
-  } = useFetchData(PRODUCTS_API + "?limit=100", page);
+  } = useFetchData(PRODUCTS_API + `?limit=10&skip=${page * 10 - 10}`, page);
 
   useEffect(() => {
     setProductsData(productsApiData?.products);
@@ -35,7 +36,7 @@ function App() {
     <div className="App">
       {productsData && productsData.length > 0 && (
         <div className="products">
-          {productsData?.slice(page * 10 - 10, page * 10).map((product) => {
+          {productsData?.map((product) => {
             return (
               <div key={product?.id} className="products__single">
                 <img src={product?.thumbnail} alt={product?.title} />
@@ -53,7 +54,7 @@ function App() {
           >
             ◀️
           </span>
-          {[...Array(productsData.length / 10)]?.map((_, i) => {
+          {[...Array(totalPages)]?.map((_, i) => {
             return (
               <span
                 key={i}
@@ -65,9 +66,7 @@ function App() {
             );
           })}
           <span
-            className={
-              page < productsData?.length / 10 ? "" : "pagination__disabled"
-            }
+            className={page < totalPages ? "" : "pagination__disabled"}
             onClick={() => selectPageHadler((page + 1) % 10)}
           >
             ▶️
