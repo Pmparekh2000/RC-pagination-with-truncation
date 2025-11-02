@@ -4,21 +4,18 @@ import useFetchData from "./hooks/useFetchData";
 import { PRODUCTS_API } from "./utils/constants";
 import { useEffect, useState } from "react";
 import Shimmer from "./components/Shimmer";
+import Pagination from "./components/Pagination";
 
 function App() {
   const [productsData, setProductsData] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(10);
 
-  const selectPageHadler = (pageNo) => {
-    setPage(pageNo);
-  };
-
   const {
     data: productsApiData,
     isLoading,
     error,
-  } = useFetchData(PRODUCTS_API + `?limit=10&skip=${page * 10 - 10}`, page);
+  } = useFetchData(PRODUCTS_API + `?limit=100&skip=${page * 10 - 10}`, page);
 
   useEffect(() => {
     setProductsData(productsApiData?.products);
@@ -47,31 +44,7 @@ function App() {
         </div>
       )}
       {productsData && productsData.length > 0 && (
-        <div className="pagination">
-          <span
-            className={page > 1 ? "" : "pagination__disabled"}
-            onClick={() => selectPageHadler(page === 1 ? 10 : page - 1)}
-          >
-            ◀️
-          </span>
-          {[...Array(totalPages)]?.map((_, i) => {
-            return (
-              <span
-                key={i}
-                className={page === i + 1 ? "pagination__selected" : ""}
-                onClick={() => selectPageHadler(i + 1)}
-              >
-                {i + 1}
-              </span>
-            );
-          })}
-          <span
-            className={page < totalPages ? "" : "pagination__disabled"}
-            onClick={() => selectPageHadler((page + 1) % 10)}
-          >
-            ▶️
-          </span>
-        </div>
+        <Pagination productsData={productsData} page={page} setPage={setPage} />
       )}
     </div>
   );
